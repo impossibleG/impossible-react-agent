@@ -1,0 +1,14 @@
+services:
+  agent:
+    build: .
+    environment:
+      AGENT_HOST: 0.0.0.0
+      AGENT_PORT: 4141
+      MODEL_BASE_URL: http://host.docker.internal:11434/v1
+      MODEL_NAME: qwen3:8b
+      MODEL_API_KEY: local
+    ports:
+      - "4141:4141"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
