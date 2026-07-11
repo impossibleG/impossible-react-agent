@@ -1,0 +1,7 @@
+POST http://127.0.0.1:4141/v1/chat
+Content-Type: application/json
+
+{
+  "input": "Count the words in this request",
+  "threadId": "example-thread"
+}
