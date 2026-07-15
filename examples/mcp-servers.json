@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "local-tools": {
+      "command": "node",
+      "args": ["../impossible-mcp-template/dist/cli.js"]
+    }
+  }
+}
