@@ -1,0 +1,22 @@
+name: Bug report
+description: Report reproducible incorrect behavior
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include commands and a minimal configuration without secrets.
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: Model runtime and version
+    validations:
+      required: true
