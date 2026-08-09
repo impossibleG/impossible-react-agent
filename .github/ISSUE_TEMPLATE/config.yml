@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/SECURITY
+    about: Use the repository Security tab to open a private advisory.
