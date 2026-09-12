@@ -16,7 +16,7 @@ ReAct means **Reasoning and Acting**. This repository is an agent runtime, not a
 - built-in example tools and optional MCP tool discovery
 - conversation threads with in-memory checkpointing
 - step limits, request deadlines, cancellation, and graceful shutdown
-- CLI and HTTP entry points
+- CLI, terminal JSON, and server-sent event HTTP entry points
 - strict TypeScript, protocol-independent tests, integration tests, and coverage gates
 - Docker, Compose, CI, security scanning, and release automation
 - complete documentation and Impossible G repository artwork
@@ -53,6 +53,7 @@ curl http://127.0.0.1:4141/v1/chat \
 ```
 
 Health and readiness routes are available at `/healthz` and `/readyz`.
+For incremental model output, send the same request body to `/v1/chat/stream` and consume the server-sent events.
 
 ## Add MCP tools
 
