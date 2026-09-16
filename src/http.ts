@@ -3,7 +3,7 @@ import type { Logger } from "pino";
 import { z } from "zod";
 import type { AgentConfig } from "./config.js";
 import type { ImpossibleAgent } from "./agent.js";
-import { runAgent } from "./runner.js";
+import { runAgent, streamAgent } from "./runner.js";
 import { toError } from "./errors.js";
 
 const requestSchema = z.object({
@@ -47,6 +47,37 @@ export async function startHttp(
     }
     if (request.method === "GET" && url.pathname === "/readyz") {
       sendJson(response, 200, { status: "ready" });
+      return;
+    }
+    if (request.method === "POST" && url.pathname === "/v1/chat/stream") {
+      try {
+        const body = requestSchema.parse(await readJson(request));
+        const controller = new AbortController();
+        request.once("aborted", () => {
+          controller.abort();
+        });
+        response.writeHead(200, {
+          "content-type": "text/event-stream; charset=utf-8",
+          "cache-control": "no-cache",
+          connection: "keep-alive",
+        });
+        for await (const chunk of streamAgent(agent, config, body.input, {
+          ...(body.threadId ? { threadId: body.threadId } : {}),
+          signal: controller.signal,
+        })) {
+          response.write(`event: ${chunk.type}\ndata: ${JSON.stringify(chunk)}\n\n`);
+        }
+        response.end();
+      } catch (cause) {
+        const error = toError(cause);
+        logger.warn({ error }, "streaming agent request failed");
+        if (!response.headersSent) {
+          sendJson(response, error.name === "ZodError" ? 400 : 500, { error: error.message });
+        } else {
+          response.write(`event: error\ndata: ${JSON.stringify({ error: error.message })}\n\n`);
+          response.end();
+        }
+      }
       return;
     }
     if (request.method !== "POST" || url.pathname !== "/v1/chat") {
