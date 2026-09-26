@@ -1,13 +1,16 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
-  <img alt="Impossible ReAct Agent" src="docs/assets/banner-light.svg" width="100%">
-</picture>
+<p align="center">
+  <img src="docs/assets/impossible-react-agent-header.png" alt="Impossible G — ReAct Agent" width="860">
+</p>
 
 # Impossible ReAct Agent
 
 A TypeScript template for an agent that reasons, calls local or MCP tools, observes their results, and continues until it can answer. It defaults to a local OpenAI-compatible model endpoint and also accepts any compatible hosted endpoint you configure.
 
 ReAct means **Reasoning and Acting**. This repository is an agent runtime, not a React user interface.
+
+<p align="center">
+  <img src="docs/assets/impossible-react-agent-scene.png" alt="A reasoning, action, observation, and continuation loop" width="100%">
+</p>
 
 ## Included
 

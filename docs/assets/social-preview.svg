@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title">
-  <title id="title">Impossible ReAct Agent</title><rect width="1280" height="640" fill="#09090b"/>
-  <rect x="52" y="52" width="1176" height="536" fill="none" stroke="#7447ff" stroke-width="6"/>
-  <text x="100" y="235" fill="#f4f1e8" font-family="Arial, sans-serif" font-weight="700" font-size="72">IMPOSSIBLE</text>
-  <text x="100" y="344" fill="#8d6aff" font-family="Arial, sans-serif" font-weight="700" font-size="98">REACT AGENT</text>
-  <text x="104" y="422" fill="#b8b5ad" font-family="Arial, sans-serif" font-size="32">Local models · TypeScript · MCP tools</text>
-  <path d="M1020 235h120v55h-72v40h55v55h-55v60h-48z" fill="#7447ff"/>
-</svg>
