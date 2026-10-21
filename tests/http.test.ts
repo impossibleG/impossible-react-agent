@@ -1,4 +1,5 @@
 import { AIMessage, AIMessageChunk } from "@langchain/core/messages";
+import { request } from "node:http";
 import pino from "pino";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ImpossibleAgent } from "../src/agent.js";
@@ -72,5 +73,34 @@ describe("agent HTTP API", () => {
     expect(body).toContain("event: text");
     expect(body).toContain('"text":"hello"');
     expect(body).toContain("event: done");
+  });
+
+  it("cancels the agent run when the client disconnects", async () => {
+    const config = loadConfig({ AGENT_PORT: "41421", AGENT_LOG_LEVEL: "silent" });
+    let signal: AbortSignal | undefined;
+    let markStarted: () => void = () => undefined;
+    const started = new Promise<void>((resolve) => {
+      markStarted = resolve;
+    });
+    const agent = {
+      invoke: vi.fn().mockImplementation((_input: unknown, options: { signal: AbortSignal }) => {
+        signal = options.signal;
+        markStarted();
+        return new Promise((_resolve, reject) => {
+          options.signal.addEventListener("abort", () => {
+            reject(new Error("aborted"));
+          });
+        });
+      }),
+    } as unknown as ImpossibleAgent;
+    runtime = await startHttp(config, agent, pino({ level: "silent" }));
+    const client = request({ host: "127.0.0.1", port: 41421, path: "/v1/chat", method: "POST" });
+    client.on("error", () => undefined);
+    client.end(JSON.stringify({ input: "wait" }));
+    await started;
+    client.destroy();
+    await vi.waitFor(() => {
+      expect(signal?.aborted).toBe(true);
+    });
   });
 });

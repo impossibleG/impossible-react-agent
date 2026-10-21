@@ -30,6 +30,15 @@ function sendJson(response: ServerResponse, status: number, body: unknown): void
   response.end(JSON.stringify(body));
 }
 
+// The response closes before it ends only when the client goes away mid-run.
+function abortOnDisconnect(response: ServerResponse): AbortController {
+  const controller = new AbortController();
+  response.once("close", () => {
+    if (!response.writableEnded) controller.abort();
+  });
+  return controller;
+}
+
 export async function startHttp(
   config: AgentConfig,
   agent: ImpossibleAgent,
@@ -52,10 +61,7 @@ export async function startHttp(
     if (request.method === "POST" && url.pathname === "/v1/chat/stream") {
       try {
         const body = requestSchema.parse(await readJson(request));
-        const controller = new AbortController();
-        request.once("aborted", () => {
-          controller.abort();
-        });
+        const controller = abortOnDisconnect(response);
         response.writeHead(200, {
           "content-type": "text/event-stream; charset=utf-8",
           "cache-control": "no-cache",
@@ -87,10 +93,7 @@ export async function startHttp(
 
     try {
       const body = requestSchema.parse(await readJson(request));
-      const controller = new AbortController();
-      request.once("aborted", () => {
-        controller.abort();
-      });
+      const controller = abortOnDisconnect(response);
       const result = await runAgent(agent, config, body.input, {
         ...(body.threadId ? { threadId: body.threadId } : {}),
         signal: controller.signal,
