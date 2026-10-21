@@ -7,3 +7,5 @@ The HTTP tests use loopback ports and close every listener after the case. Run t
 ```bash
 npm run verify
 ```
+
+The gate starts with `npm run privacy`, which fails if any tracked file contains a home-directory path, a private key, or an inline API key assignment.

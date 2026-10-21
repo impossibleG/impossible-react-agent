@@ -77,14 +77,14 @@ Set `MCP_CONFIG_PATH` to its path. Tools from every configured server become ava
 
 ## Commands
 
-| Command                        | Purpose                                             |
-| ------------------------------ | --------------------------------------------------- |
-| `npm run dev -- --input "..."` | Run one prompt with source files                    |
-| `npm run dev -- --serve`       | Start the development HTTP API                      |
-| `npm run build`                | Compile the production package                      |
-| `npm test`                     | Run tests once                                      |
-| `npm run test:coverage`        | Run tests and enforce coverage gates                |
-| `npm run verify`               | Run formatting, linting, types, coverage, and build |
+| Command                        | Purpose                                                                |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `npm run dev -- --input "..."` | Run one prompt with source files                                       |
+| `npm run dev -- --serve`       | Start the development HTTP API                                         |
+| `npm run build`                | Compile the production package                                         |
+| `npm test`                     | Run tests once                                                         |
+| `npm run test:coverage`        | Run tests and enforce coverage gates                                   |
+| `npm run verify`               | Run the privacy check, formatting, linting, types, coverage, and build |
 
 ## Documentation
 
