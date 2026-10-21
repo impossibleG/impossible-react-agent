@@ -7,11 +7,24 @@ import { runAgent, streamAgent } from "./runner.js";
 import { toError } from "./errors.js";
 
 const requestSchema = z.object({
-  input: z.string().min(1).max(100_000),
+  input: z
+    .string()
+    .max(100_000)
+    .refine((value) => value.trim().length > 0, "Input must not be empty"),
   threadId: z.string().min(1).max(200).optional(),
 });
 
 export type HttpRuntime = { server: Server; close: () => Promise<void> };
+
+class RequestError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "RequestError";
+  }
+}
 
 async function readJson(request: IncomingMessage, limit = 1_000_000): Promise<unknown> {
   const chunks: Buffer[] = [];
@@ -19,10 +32,19 @@ async function readJson(request: IncomingMessage, limit = 1_000_000): Promise<un
   for await (const chunk of request) {
     const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as Uint8Array);
     size += buffer.length;
-    if (size > limit) throw new Error("Request body is too large");
+    if (size > limit) throw new RequestError(413, "Request body is too large");
     chunks.push(buffer);
   }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    throw new RequestError(400, "Request body must be valid JSON");
+  }
+}
+
+function errorStatus(error: Error): number {
+  if (error instanceof RequestError) return error.status;
+  return error.name === "ZodError" ? 400 : 500;
 }
 
 function sendJson(response: ServerResponse, status: number, body: unknown): void {
@@ -78,7 +100,7 @@ export async function startHttp(
         const error = toError(cause);
         logger.warn({ error }, "streaming agent request failed");
         if (!response.headersSent) {
-          sendJson(response, error.name === "ZodError" ? 400 : 500, { error: error.message });
+          sendJson(response, errorStatus(error), { error: error.message });
         } else {
           response.write(`event: error\ndata: ${JSON.stringify({ error: error.message })}\n\n`);
           response.end();
@@ -102,7 +124,7 @@ export async function startHttp(
     } catch (cause) {
       const error = toError(cause);
       logger.warn({ error }, "agent request failed");
-      sendJson(response, error.name === "ZodError" ? 400 : 500, { error: error.message });
+      sendJson(response, errorStatus(error), { error: error.message });
     }
   }
 

@@ -103,4 +103,22 @@ describe("agent HTTP API", () => {
       expect(signal?.aborted).toBe(true);
     });
   });
+
+  it("answers malformed, blank, and oversized requests with client errors", async () => {
+    const config = loadConfig({ AGENT_PORT: "41422", AGENT_LOG_LEVEL: "silent" });
+    const invoke = vi.fn();
+    runtime = await startHttp(
+      config,
+      { invoke } as unknown as ImpossibleAgent,
+      pino({ level: "silent" }),
+    );
+    const post = (path: string, body: string) =>
+      fetch(`http://127.0.0.1:41422${path}`, { method: "POST", body });
+    for (const path of ["/v1/chat", "/v1/chat/stream"]) {
+      expect((await post(path, "{not json")).status).toBe(400);
+      expect((await post(path, JSON.stringify({ input: "   " }))).status).toBe(400);
+      expect((await post(path, JSON.stringify({ input: "x".repeat(1_000_001) }))).status).toBe(413);
+    }
+    expect(invoke).not.toHaveBeenCalled();
+  });
 });
