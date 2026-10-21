@@ -15,11 +15,12 @@
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "lint": "eslint .",
+    "privacy": "node scripts/privacy-check.mjs",
     "start": "node dist/cli.js",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "verify": "npm run format && npm run lint && npm run check && npm run test:coverage && npm run build"
+    "verify": "npm run privacy && npm run format && npm run lint && npm run check && npm run test:coverage && npm run build"
   },
   "dependencies": {
     "@langchain/core": "1.2.12",
