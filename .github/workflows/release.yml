@@ -16,6 +16,6 @@ jobs:
       - run: npm ci
       - run: npm run verify
       - run: tar -czf impossible-react-agent-${GITHUB_REF_NAME}.tar.gz dist package.json README.md LICENSE THIRD_PARTY_NOTICES.md
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: impossible-react-agent-${{ github.ref_name }}.tar.gz
